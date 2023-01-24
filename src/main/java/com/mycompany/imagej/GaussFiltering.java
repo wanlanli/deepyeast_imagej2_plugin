@@ -19,6 +19,8 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.UIService;
 
+import org.tensorflow.Tensor;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +49,7 @@ public class GaussFiltering<T extends RealType<T>> implements Command {
 
     @Parameter
     private OpService opService;
-
+ 
     @Override
     public void run() {
         final Img<T> image = (Img<T>)currentData.getImgPlus();
@@ -56,6 +58,11 @@ public class GaussFiltering<T extends RealType<T>> implements Command {
         // Enter image processing code here ...
         // The following is just a Gauss filtering example
         //
+        HelloTensorFlow model = new HelloTensorFlow();
+        
+        // Tensor input_tensor = Tensor.create(image);
+        // Tensor out = model.predict(input_tensor);
+        
         final double[] sigmas = {1.0, 3.0, 5.0};
 
         List<RandomAccessibleInterval<T>> results = new ArrayList<>();
