@@ -106,5 +106,9 @@
 			<artifactId>tensorflow-core-platform</artifactId>
 			<version>0.4.2</version>
 		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-tensorflow</artifactId>
+		</dependency>
 	</dependencies>
 </project>
