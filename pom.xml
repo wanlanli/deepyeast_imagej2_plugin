@@ -84,8 +84,8 @@
 		
 		<exec.mainClass>HelloTensorFlow</exec.mainClass>
         <!-- Minimal version for compiling TensorFlow Java is JDK 8 -->
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <!--<maven.compiler.source>1.8</maven.compiler.source> -->
+        <!-- <maven.compiler.target>1.8</maven.compiler.target>-->
 
 	</properties>
 
@@ -100,6 +100,15 @@
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej</artifactId>
+		</dependency>
+		<!--dependency>
+			<groupId>org.tensorflow</groupId>
+			<artifactId>tensorflow</artifactId>
+		<dependency-->
+		<dependency>
+			<groupId>net.imglib2</groupId>
+			<artifactId>imglib2-ij</artifactId>
+		 	<version>2.0.0-beta-38</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tensorflow</groupId>

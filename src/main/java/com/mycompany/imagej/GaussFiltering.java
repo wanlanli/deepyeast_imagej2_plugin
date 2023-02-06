@@ -14,9 +14,19 @@ import net.imagej.ops.OpService;
 import net.imagej.tensorflow.Tensors;
 
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.converter.Converter;
+import net.imglib2.converter.Converters;
 import net.imglib2.img.Img;
+import net.imglib2.img.array.ArrayImg;
+import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.img.basictypeaccess.array.FloatArray;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
+// import net.imglib2.type.numeric.integer.LongType;
+// import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.Intervals;
+import net.imglib2.util.Util;
 
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
@@ -24,10 +34,23 @@ import org.scijava.plugin.Plugin;
 import org.scijava.ui.UIService;
 
 import org.tensorflow.Tensor;
+import org.tensorflow.ndarray.FloatNdArray;
+import org.tensorflow.ndarray.NdArrays;
+import org.tensorflow.ndarray.Shape;
+
+import java.nio.FloatBuffer;
+
+import org.tensorflow.DataType;
+import org.tensorflow.types.TFloat16;
+
+// import org.tensorflow.types.UInt8;
+
+// import net.imglib2.img.basictypeaccess.array.LongArray;
+
 //import org.tensorflow.ndarray.Shape;
 //import org.tensorflow.ndarray.buffer.ByteDataBuffer;
 //import org.tensorflow.op.Ops;
-//import org.tensorflow.types.TFloat16;
+import org.tensorflow.types.UInt8;
 //import org.tensorflow.types.TFloat32;
 //import org.tensorflow.types.TString;
 //import org.tensorflow.ndarray.ByteNdArray;
@@ -35,13 +58,15 @@ import org.tensorflow.Tensor;
 //import org.tensorflow.ndarray.buffer.DataBuffers;
 //import org.tensorflow.op.image.DecodeImage;
 //import org.tensorflow.op.Scope;
-//import org.tensorflow.Graph;
+import org.tensorflow.Graph;
+import org.tensorflow.Session;
 
 //import java.awt.image.BufferedImage;
 import java.io.File;
+// import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import net.imglib2.type.numeric.real.FloatType;
+// import net.imglib2.type.numeric.real.FloatType;
 /**
  * This example illustrates how to create an ImageJ {@link Command} plugin.
  * <p>
@@ -66,24 +91,70 @@ public class GaussFiltering<T extends RealType<T>> implements Command {
 
     @Parameter
     private OpService opService;
-    
+
     @Override
     public void run() {
         final Img<T> image = (Img<T>)currentData.getImgPlus();
-        System.out.print(image.dimension(0));
-        System.out.print(image.dimension(1));
- 
-        System.out.print("aaaa");
-        // Tensor input_tensor = TensorManagement.imPlus2tensor(image, "HW");
-        
-		int[] dimOrder = new int[2];
-		for (int i = 0; i < 2; i++) {
-			dimOrder[i] = 512;
+        System.out.print(image.numDimensions());
+        System.out.print(image.getAt(100,200));
+        System.out.print("aaaa");        
+        int numberdim = image.numDimensions();
+        int[] dimOrder = new int[numberdim];
+		for (int i = 0; i < numberdim; i++) {
+			dimOrder[i] = (int) image.dimension(i);
 		}
-		System.out.print("\nbbbbbb");
-		Tensor input_tensor = Tensors.tensor(image, dimOrder);
-		System.out.print("\nccccc");
-		System.out.print(input_tensor);
+		// Img<FloatType> region = ImagePlusAdapter.wrap(img);
+		// RandomAccessibleInterval a = TensorManagement.imPlus2tensor(image, "HW");
+		// float[] b = ImageProcess.createFloatArray(a);
+		if (numberdim==2) {
+			int h = dimOrder[0];
+			int w = dimOrder[1];
+			FloatNdArray matrix = NdArrays.ofFloats(Shape.of(h, w, 1));
+			for (int i=0; i<h; i++) {
+				System.out.print(i);
+				System.out.print("\n");
+				for (int j=0; j<w; j++) {
+					T v = image.getAt(i, j);
+					float v1 = v.getRealFloat();
+					// System.out.print(v1);
+					
+					FloatNdArray values = NdArrays.scalarOf(v1);
+					matrix.set(values, i,j,0);
+				}
+			}
+			try (Tensor input = Tensor.of(TFloat16.class, Shape.of(100, 100, 1))){
+				  System.out.print("t");
+			}
+		}
+		
+//		System.out.print("\nbbbbbb");
+//		Graph graph = new Graph();
+//		Session session = new Session(graph);
+//		Tensor input_tensor = Tensors.tensor(image);
+//		session.runner().feed("sequential_1_input", input_tensor).fetch("output/Softmax").run().get(0);
+//		System.out.print("\n222222");
+//		session.close();
+		// Tensor input_tensor = Tensors.tensor(image);
+
+		// Tensor<?> input_senor = Tensors.tensor(image);
+		// Tensor<?> input_senor = Tensors.tensor(image);
+		// try(Tensor<?> input_senor = Tensor.create(input)){
+//		final int NUM_PREDICTIONS = 1;
+//        Tensor<?> x = Tensor.create(
+//                new long[] {NUM_PREDICTIONS}, 
+//                FloatBuffer.wrap( new float[] {2.0f} ) );
+        System.out.print("\nccccc");
+//		try(Tensor<?> input_senor = Tensor.create(2.0f)){
+//			System.out.print("\nccccc");
+//			System.out.print(input_senor);
+//		}
+//		catch(Exception e) {
+//			System.out.print("\ndddddd");
+//			System.out.print(e);
+//		}
+//		finally {
+//			System.out.println("The 'try catch' is finished.");
+//		}
 //        Graph graph = new Graph();
 //        Scope scope = new Scope(graph);
 //        DecodeImage.create(scope, image.toString(), TFloat16.class);

@@ -33,24 +33,21 @@ public class HelloTensorFlow {
 	  HelloTensorFlow myModel = new HelloTensorFlow();
 	  myModel.load("/home/wli6/project/fiji_plugin/models/save2/save2/");
 	  // input
-//	  FloatNdArray matrix = NdArrays.ofFloats(Shape.of(2, 3, 2));
-//
-//	  // Initialize sub-matrices data with vectors
-//	  matrix.set(NdArrays.vectorOf(1.0f, 2.0f), 0, 0)
-//	        .set(NdArrays.vectorOf(3.0f, 4.0f), 0, 1)
-//	        .set(NdArrays.vectorOf(5.0f, 6.0f), 0, 2)
-//	        .set(NdArrays.vectorOf(7.0f, 8.0f), 1, 0)
-//	        .set(NdArrays.vectorOf(9.0f, 10.0f), 1, 1)
-//	        .set(NdArrays.vectorOf(11.0f, 12.0f), 1, 2);
-//	  FloatNdArray x = matrix.get(1);
-//	  System.out.print(x.getFloat(0, 0));
+	  FloatNdArray matrix = NdArrays.ofFloats(Shape.of(100, 100, 1));
+	  for (int i=0;i<2;i++) {
+		  for (int j=0;j<2;j++) {
+			  for (int k=0; k<2; k++) {
+				  float value = i*k*j;
+				  FloatNdArray values = NdArrays.scalarOf(value);
+				  matrix.set(values, i,j,k);
+			  }
+		  }
+	  }
 	  // prediction
-	  try (Tensor input = Tensor.of(TFloat16.class, Shape.of(100, 100, 1))){
+	  try (Tensor input = Tensor.of(TFloat16.class, Shape.of(100, 100, 1), matrix::copyTo)){
 		  System.out.print("t");
 		  Tensor out = myModel.predict(input);
 		  System.out.print(out.shape());
-		  FloatNdArray matrix = NdArrays.ofFloats(Shape.of(100, 100, 1));
-		  matrix.setFloat(0, null); 
 	  }
 	  // Tensor out = myModel.predict(input);
 	  System.out.print("end");

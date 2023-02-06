@@ -48,7 +48,7 @@ public class TensorManagement {
 	
 	// From RAI to Tensor
 	
-	public static Tensor imPlus2tensor(Img region, String form){
+	public static RandomAccessibleInterval imPlus2tensor(Img region, String form){
 		// Convert ImagePlus into tensor calling the corresponding
 		// method depending on the dimensions of the required tensor 
 		// Find the number of dimensions of the tensor
@@ -59,9 +59,9 @@ public class TensorManagement {
 		String RAIForm = createRAIForm(og_dims);
 		String expandedRAIForm = expandedForm(RAIForm, form);
 		RandomAccessibleInterval<FloatType> feedable_image = adaptDimensions((RandomAccessibleInterval<FloatType>)region, form.length());
-		int[] dimsAssociation = createDimOrder(expandedRAIForm.split(""), form);
-		final Tensor tensor = Tensors.tensor(feedable_image, dimsAssociation);
-		return tensor;
+		// int[] dimsAssociation = createDimOrder(expandedRAIForm.split(""), form);
+		// final Tensor tensor = Tensors.tensor(feedable_image, dimsAssociation);
+		return feedable_image;
 	}
 	
 	
