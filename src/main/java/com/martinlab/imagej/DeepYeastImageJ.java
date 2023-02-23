@@ -5,47 +5,44 @@
  * See the CC0 1.0 Universal license for details:
  *     http://creativecommons.org/publicdomain/zero/1.0/
  */
+package com.martinlab.imagej;
 
-package com.mycompany.imagej;
-
-import net.imagej.Dataset;
-import net.imagej.ImageJ;
-import net.imagej.ops.OpService;
-import net.imglib2.img.Img;
-import net.imglib2.type.numeric.RealType;
+import java.io.File;
 
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.UIService;
-
 import org.tensorflow.Tensor;
+// import org.tensorflow.Tensor;
+// import org.tensorflow.ndarray.NdArray;
 import org.tensorflow.ndarray.FloatNdArray;
 import org.tensorflow.ndarray.NdArrays;
 import org.tensorflow.ndarray.Shape;
 import org.tensorflow.types.TFloat16;
 import org.tensorflow.types.TInt32;
 
-import java.io.File;
-
-import ij.process.ImageProcessor;
-import ij.process.FloatProcessor;
-import ij.ImageStack;
 import ij.ImagePlus;
-
-
+import ij.ImageStack;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
+import net.imagej.Dataset;
+import net.imagej.ImageJ;
+import net.imagej.ops.OpService;
+import net.imglib2.img.Img;
+import net.imglib2.type.numeric.RealType;
 /**
  * This example illustrates how to create an ImageJ {@link Command} plugin.
  * <p>
- * The code here is a simple Gaussian blur using ImageJ Ops.
+ * The code here is a simple DeepYeastImageJ blur using ImageJ Ops.
  * </p>
  * <p>
  * You should replace the parameter fields with your own inputs and outputs,
  * and replace the {@link run} method implementation with your own logic.
  * </p>
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Gauss Filtering")
-public class GaussFiltering<T extends RealType<T>> implements Command {
+@Plugin(type = Command.class, menuPath = "Plugins>DeepYeastImageJ")
+public class DeepYeastImageJ<T extends RealType<T>> implements Command {
     //
     // Feel free to add more parameters here...
     //
@@ -58,17 +55,29 @@ public class GaussFiltering<T extends RealType<T>> implements Command {
 
     @Parameter
     private OpService opService;
-
+    public static TensorFlowModel model = new TensorFlowModel();
+    public static String model_path;
+    
     @Override
     public void run() {
+    	System.out.print("start\n");
+        if (model.getmodel()==false) {
+        	if(model_path==null) {
+            	ParamGUI window = new ParamGUI();
+            	window.run("Load Model");
+            	model_path = window.model_path;
+        	}
+        	System.out.print("load model");
+        	// model = new HelloTensorFlow();
+        	model.load(model_path);
+        	System.out.print("model loaded \n");
+        }
+        // HelloTensorFlow model = new HelloTensorFlow();
+
         final Img<T> image = (Img<T>)currentData.getImgPlus();
-        System.out.print("start\n");
-        HelloTensorFlow model = new HelloTensorFlow();
-        model.load("/home/wli6/project/fiji_plugin/models/save2/save2/");
-        System.out.print("model loaded \n");
-        
         int[] dimOrder = getDim(image);
         System.out.print("dimorder:"+dimOrder+"\n");
+        
         FloatNdArray matrix = image2array(image);
         System.out.print("to matrix:"+matrix.shape()+"\n");
 
@@ -84,8 +93,8 @@ public class GaussFiltering<T extends RealType<T>> implements Command {
 	        for (int i = 0; i < 1; i++)
 	        	stack.addSlice("", outimage);
 	        ImagePlus a = new ImagePlus("stack", stack);
-	        // you do not need to show intermediate images
-	        a.show();
+	        // you do not need to show intermediate image
+	        a.show();        
 		}
 	}
     public int[] getDim(Img<T> image) {
@@ -151,9 +160,9 @@ public class GaussFiltering<T extends RealType<T>> implements Command {
 
             // show the image
             ij.ui().show(dataset);
-
+            
             // invoke the plugin
-            ij.command().run(GaussFiltering.class, true);
+            ij.command().run(DeepYeastImageJ.class, true);
         }
     }
 
